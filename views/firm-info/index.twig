@@ -1,0 +1,200 @@
+{% extends "@app/views/based.twig" %}
+
+{% block script_head %}
+<link rel="stylesheet" href="{{ path('@web/media/jqwidgets/styles/jqx.base.css') }}" type="text/css" />
+<link rel="stylesheet" href="{{ path('@web/media/jqwidgets/styles/jqx.classic.css') }}" type="text/css" />
+    <script type="text/javascript" src="{{ path('@web/js/jquery-1.11.1.min.js') }}"></script>
+    <script type="text/javascript" src="{{ path('@web/media/jqwidgets/jqxcore.js') }}"></script>
+    <script type="text/javascript" src="{{ path('@web/media/jqwidgets/jqxdata.js') }}"></script>
+    <script type="text/javascript" src="{{ path('@web/media/jqwidgets/jqxbuttons.js') }}"></script>
+    <script type="text/javascript" src="{{ path('@web/media/jqwidgets/jqxscrollbar.js') }}"></script>
+    <script type="text/javascript" src="{{ path('@web/media/jqwidgets/jqxlistbox.js') }}"></script>
+    <script type="text/javascript" src="{{ path('@web/media/jqwidgets/jqxdropdownlist.js') }}"></script>
+    <script type="text/javascript" src="{{ path('@web/media/jqwidgets/jqxmenu.js') }}"></script>
+    <script type="text/javascript" src="{{ path('@web/media/jqwidgets/jqxgrid.js') }}"></script>
+    <script type="text/javascript" src="{{ path('@web/media/jqwidgets/jqxgrid.pager.js') }}"></script>
+    <script type="text/javascript" src="{{ path('@web/media/jqwidgets/jqxgrid.sort.js') }}"></script>
+    <script type="text/javascript" src="{{ path('@web/media/jqwidgets/jqxgrid.filter.js') }}"></script>
+    <script type="text/javascript" src="{{ path('@web/media/jqwidgets/jqxgrid.columnsresize.js') }}"></script>
+    <script type="text/javascript" src="{{ path('@web/media/jqwidgets/jqxgrid.selection.js') }}"></script>
+    <script type="text/javascript" src="{{ path('@web/media/jqwidgets/jqxpanel.js') }}"></script>
+    <script type="text/javascript" src="{{ path('@web/media/jqwidgets/jqxgrid.export.js') }}"></script>
+    <script type="text/javascript" src="{{ path('@web/media/jqwidgets/jqxwindow.js') }}"></script>
+    <script type="text/javascript" src="{{ path('@web/media/jqwidgets/jqxcheckbox.js') }}"></script>
+
+<style type="text/css">
+	.btncss {
+		text-align: left;
+		padding-top:8px;
+		padding-left:10px;
+		vertical-align: middle;
+		width:95%;
+		height: 30px;
+		font-family: sans-serif;
+		font-size: 1.2em;
+	}
+	.btncss a {
+		text-decoration: none;
+	}
+  .el-icon-plus-sign {
+  	color: rgb(201, 255, 195);
+  }
+  .el-icon-minus-sign {
+  	color:rgba(255, 0, 0, 1);
+  }
+  .delrec {
+      border-color: red;
+      border-width: 1px;
+  }
+</style>
+{% endblock %}
+{% block main %}
+
+         <div id='jqxWidget'>
+         	 <div class="btncss"><span class="glyphicon glyphicon-plus"></span>&nbsp;<a href="{{ path('@web/firm-info/create') }}" value="新增新增企業">新增新增企業</a></div>
+       		 <div id="jqxgrid" ></div>
+    	 </div>
+
+
+{% endblock %}
+{% block script_end %}
+
+    <script>
+        $(function () {
+            var theme = 'energyblue';
+            var source =
+            {
+                datatype: "json",
+                datafields: [
+                    {name: 'F_NAME', type: 'string'},
+                    {name: 'F_TYPE', type: 'string'},
+                    {name: 'REF_F_ID', type: 'string'},
+                    {name: 'RECOM_FLAG', type: 'string'},
+                    {name: 'PRINT_FLAG', type: 'string'},
+                    {name: 'STATUS', type: 'string'},
+                    {name: 'FIRM_ID', type: 'string'}
+                ],
+                cache: false,
+                url: "{{ path('@web/firm-info/griddata-service/') }}",
+                root: 'Rows',
+                beforeprocessing: function (data) {
+                    if (data[0]) {
+                        source.totalrecords = data[0].TotalRows;
+                    }
+                }
+            };
+            var dataAdapter = new jQuery.jqx.dataAdapter(source, {formatData: function (data) {
+                data.searchField = 'F_NAME';
+                data.searchString = $("#searchterm").val();
+                return data;
+            }});
+            var status;
+
+            var andlinkrenderer = function (row, column, value) {
+                status = value;
+            };
+
+            //功能列功能一覽
+            var linkrenderer = function (row, column, value) {
+
+                var html = '<div class="btncss juiker-jqxGrid-toolbar">';
+                //alert(row+'||'+column+'||'+value);
+                var editurl = '{{ path('@web/firm-info/update')  }}' + '?FIRM_ID=' + value;
+                html = html + "<a href='" + editurl + "'><span class='glyphicon glyphicon-edit' data-toggle='tooltip' title='{{ t('app', '編輯')  }}'><span></a>";
+                html = html + "</div>";
+                return html;
+            };
+
+            var columnsrenderer = function (value) {
+                return '<div class="juiker-jqGrid-header">' + value + '</div>';
+            };
+
+
+            var selectText = function (element) {
+                var doc = element.ownerDocument, selection, range;
+                if (doc.body.createTextRange) { // ms
+                    range = doc.body.createTextRange();
+                    range.moveToElementText(element);
+                    range.select();
+                } else if (window.getSelection) {
+                    selection = window.getSelection();
+                    if (selection.setBaseAndExtent) { // webkit
+                        selection.setBaseAndExtent(element, 0, element, 1);
+                    } else { // moz, opera
+                        range = doc.createRange();
+                        range.selectNodeContents(element);
+                        selection.removeAllRanges();
+                        selection.addRange(range);
+                    }
+                }
+            };
+            // prepare jqxChart settings
+            var getLocalization = function () {
+                var localizationobj = {};
+                localizationobj.pagergotopagestring = "前往";
+                localizationobj.pagershowrowsstring = "顯示";
+                localizationobj.pagerrangestring = " 總計 ";
+                return localizationobj;
+            }
+            var rownumberrenderer = function (row, columnfield, value, defaulthtml, columnproperties) {
+                var val = value + 1;
+                return '<span style="margin: 4px; float: ' + columnproperties.cellsalign + '; color: #0000ff;">' + val + '</span>';
+            }
+
+            // initialize jqxGrid
+            $("#jqxgrid").jqxGrid(
+                    {
+                        width: "100%",
+                        source: dataAdapter,
+                        theme: theme,
+                        autoheight: true,
+                        //columnsresize: true,
+                        altrows: true,
+                        pageable: true,
+                        sortable: true,
+                        autorowheight: true,
+                        enablebrowserselection: true,
+                        selectionmode: 'checkbox',
+                        localization: getLocalization(),
+                        showtoolbar: true,
+                        rendertoolbar: function (toolbar) {
+                            var me = this;
+                            var container = $("<div style='margin: 5px;'></div>");
+                            var span = $("<span style='float: left; margin-top: 5px; margin-right: 4px;'>企業名稱： </span>");
+                            var input = $("<input class='jqx-input jqx-widget-content jqx-rc-all' id='searchterm' type='text' style='height: 23px; float: left; width: 223px;' />");
+                            toolbar.append(container);
+                            container.append(span);
+                            container.append(input);
+                            if (theme !== "") {
+                                input.addClass('jqx-widget-content-' + theme);
+                                input.addClass('jqx-rc-all-' + theme);
+                            }
+                            input.bind('keydown', function (event) {
+                                if (input.val().length >= 1) {
+                                    if (me.timer)
+                                        clearTimeout(me.timer);
+                                    me.timer = setTimeout(function () {
+                                        dataAdapter.dataBind();
+                                    }, 300);
+                                }
+                            });
+                            // $('[data-toggle="tooltip"]').tooltip();
+                        },
+                        columns: [
+                            { text: '序號', dataField: '', columntype: 'number', width: '5%',cellsrenderer: rownumberrenderer },
+                            {text: '{{ t('app', '企業名稱') }}', columntype: 'textbox', width: '25%', datafield: 'F_NAME',renderer: columnsrenderer},
+                            {text: '{{ t('app', '群首企業') }}', columntype: 'textbox', width: '25%', datafield: 'REF_F_ID',renderer: columnsrenderer},
+                            {text: '{{ t('app', '申請類型') }}', columntype: 'textbox', width: '9%', datafield: 'F_TYPE',renderer: columnsrenderer},
+                            {text: '{{t('app', '可推薦') }}', columntype: 'textbox', width: '8%', datafield: 'RECOM_FLAG',renderer: columnsrenderer},
+                            {text: '{{ t('app', '允許列印') }}', columntype: 'textbox', width: '8%', datafield: 'PRINT_FLAG',renderer: columnsrenderer},
+                            {text: '{{ t('app', '啟用MVPN') }}', columntype: 'textbox', width: '10%', datafield: 'STATUS',renderer: columnsrenderer},
+                            {text: '{{ t('app', '操作選項') }}', datafield: 'FIRM_ID', width: '10%', cellsrenderer: linkrenderer,renderer: columnsrenderer}
+                        ]
+
+                    });
+        });
+    </script>
+
+{% endblock %}
+
+

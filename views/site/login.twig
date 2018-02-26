@@ -1,0 +1,46 @@
+{% extends "@app/views/based.twig" %}
+
+{% block main %}
+
+    {{ set(this, 'title', '登入系統') }}
+{{ set(this, 'params', { 'breadcrumbs' : { '' : this.title } }) }}
+
+<div class="login-block">
+    <h1>{{ this.title }}</h1>
+    <br>
+    <p>請填帳號及密碼:</p>
+    {% set form = active_form_begin({
+        'id' : 'login-form',
+        'options' : {
+            'enableClientValidation': true,
+            'class' : 'form-horizontal',
+            'errorSummaryCssClass': 'error-summary alert alert-error',
+            'enctype' : 'multipart/form-data',
+            'fieldConfig': {
+                'template' : "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-8\">{error}</div>",
+                'labelOptions' : { 'class' : 'col-lg-1 control-label' }
+            }
+          },
+       })
+    %}
+
+     {{ form.field(model, 'username').textInput({'maxlength': '16','style':'width:150px'}) |raw }}
+     {{ form.field(model, 'password').passwordInput({'maxlength':'12','style':'width:150px'}) |raw }}
+     {{ form.field(model, 'rememberMe').checkbox() |raw }}
+     {{ html.submitButton(
+         '登入', {
+             'id' : 'submitted',
+             'name' : 'login-button',
+             'class' : 'btn btn-primary'}
+
+         ) | raw }}
+
+     {{ active_form_end() }}
+
+    <div style="color:#999;">
+        可以用 <strong>admin/admin</strong> 或 <strong>demo/demo</strong>登入系統<br>
+        如要更改帳號、密碼，請修改程式碼: <code>app\models\User::$users</code>.
+    </div>
+</div>
+
+{% endblock %}

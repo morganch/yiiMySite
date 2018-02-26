@@ -1,0 +1,32 @@
+    {{ register_asset_bundle('app/assets/AppAsset') }}  {# asset root for yii advanced template #}
+    {{   void(this.beginPage()) }}
+    <!DOCTYPE html>
+    <html lang="{{ app.language }}">
+        <head>
+            <meta charset="{{ app.charset }}">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>{{ html.encode(this.title) }}</title>
+            {{ html.csrfMetaTags | raw }}
+            {{   void(this.head) }}
+            {% block script_head %} 
+                
+            {% endblock %}
+        </head>
+        <body>
+            {{   void(this.beginBody()) }}
+            <section id="header">
+                {# header content #}
+            </section>
+            {{ content | raw}}
+            <footer class="footer">
+                <div class="container">
+                    {# footer content #}
+                </div>
+            </footer>
+            {{   void(this.endBody()) }}
+        </body>
+        {% block script_end %}
+        
+        {% endblock %}
+    </html>
+    {{   void(this.endPage()) }}
