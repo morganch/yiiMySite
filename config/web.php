@@ -7,7 +7,7 @@ $config = [
     'layout' => 'main.php',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
-    'vendorPath' => dirname(__DIR__) . '/vendor',
+    'vendorPath' => '/var/www/vendor',
     'components' => [
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation

@@ -41,7 +41,7 @@ RUN apt-get update \
     && apt-get autoremove -y \
     && rm -r /var/lib/apt/lists/*
 
-COPY --from=vendor /var/www/vendor /var/www/html/vendor
-RUN mv /var/www/html/vendor/bower-asset /var/www/html/vendor/bower
+COPY --from=vendor /var/www/vendor /var/www/vendor
+RUN mv /var/www/vendor/bower-asset /var/www/vendor/bower
 
 WORKDIR /var/www/html

@@ -7,9 +7,9 @@ defined('YII_DEBUG') or define('YII_DEBUG', true);
 
 //require(__DIR__ . '/../vendor/autoload.php');
 //require(__DIR__ . '/../vendor/yiisoft/yii2/Yii.php');
-require('/var/www/html/vendor/autoload.php');
+require('/var/www/vendor/autoload.php');
 
-require('/var/www/html/vendor/yiisoft/yii2/Yii.php');
+require('/var/www/vendor/yiisoft/yii2/Yii.php');
 
 $config = require(__DIR__ . '/../config/web.php');
 //$config = Config::bootstrap('/var/www/html');
