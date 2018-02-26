@@ -1,0 +1,54 @@
+version: '2'
+services:
+    mcMysqlData:
+        image: busybox
+        volumes:
+          - ./mysql-data:/var/lib/mysql
+
+    web:
+        build: ./
+
+        # During development we map local files into the container
+        volumes:
+            # Map current working copy into the container
+            - ./:/var/www/html/
+
+            # Uncomment to use dev specific Apache or PHP configurations
+            #- ./config/apache/local.conf:/etc/apache2/apache2.conf
+            #- ./config/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+
+            # Uncomment to use the local vendor directory, e.g. for debugging.
+            # This requires that you have copied the directory to your host with
+            #   docker-compose run --rm web cp -ra /var/www/vendor .
+            #- ./vendor:/var/www/vendor
+
+        links:
+            - db
+        environment:
+            ENABLE_ENV_FILE: 1
+        ports:
+            - "8080:80"
+
+    db:
+        image: mysql
+        ports:
+            - "3306:3306"
+        environment:
+            MYSQL_ROOT_PASSWORD: morgan 
+            MYSQL_DATABASE: jcomp 
+            MYSQL_USER: root 
+            MYSQL_PASSWORD: morgan
+        volumes_from:
+            - "mcMysqlData" 
+
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        environment:
+          - PMA_ARBITRARY=1
+        restart: always
+        ports:
+          - 8082:80
+        links:
+          - db:mysql
+        volumes:
+          - /sessions
